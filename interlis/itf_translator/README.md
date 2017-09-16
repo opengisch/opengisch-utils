@@ -29,12 +29,9 @@ the line are readed from the top to the bottom. If a translation key is repeated
 To translate the file `cad088_0616_V3mens.itf` based on the MD01MOVD model from French to German:
 
 ```
-    translator = ITFTranslatorMD01MOVD(
-        '/home/mario/cad088_0616_V3mens.itf'
-    )
+translator = ITFTranslatorMD01MOVD('/home/mario/cad088_0616_V3mens.itf')
 
-    translator.translate(
-        'cad088_0616_V3mens_DE.itf', ITFTranslator.LANGUAGE_FR, ITFTranslator.LANGUAGE_DE)
+translator.translate('cad088_0616_V3mens_DE.itf', ITFTranslator.LANGUAGE_FR, ITFTranslator.LANGUAGE_DE)
 ```
 
 A file named `cad088_0616_V3mens_DE.itf` with the translation will be created. 
