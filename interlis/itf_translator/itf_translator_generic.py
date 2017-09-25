@@ -1,7 +1,10 @@
 """This module contains ITFTranslator, Dictionary and SpecialCaseRule classe"""
 
+# To call open with encoding in Python2 like in Python3
+from io import open
 
-class ITFTranslator:
+
+class ITFTranslator(object):
     """Generic translator of itf (Interlis transfer format version 1) files"""
 
     LANGUAGE_DE = 0
@@ -42,9 +45,9 @@ class ITFTranslator:
         dictionary = Dictionary(
             self.dictionary_file_path, language_from, language_to)
 
-        file = open(self.itf_file_path, 'r', encoding='ISO-8859-1')
+        itf_file = open(self.itf_file_path, 'r', encoding='ISO-8859-1')
         output_file = open(output_file_path, 'w')
-        data = file.readlines()
+        data = itf_file.readlines()
 
         current_topic = None
         current_table = None
@@ -128,8 +131,8 @@ class ITFTranslator:
         dictionary = Dictionary(
             self.dictionary_file_path, language_from, language_to)
 
-        file = open(self.itf_file_path, 'r', encoding='ISO-8859-1')
-        data = file.readlines()
+        file_itf = open(self.itf_file_path, 'r', encoding='ISO-8859-1')
+        data = file_itf.readlines()
         for line in data:
             words = line.split()
 

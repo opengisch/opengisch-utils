@@ -1,3 +1,4 @@
+import os
 from itf_translator_generic import ITFTranslator
 from itf_translator_generic import SpecialCaseRule
 
@@ -38,7 +39,11 @@ class ITFTranslatorDM01AVCH(ITFTranslator):
                 'Copertura_del_suolo', 'PosNome_Oggetto', 'PosNom_objet')
         ]
 
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        dictionary_file = os.path.join(
+            current_dir, 'dictionary_data', 'translations_DM01AVCH.txt')
+
         super(ITFTranslatorDM01AVCH, self).__init__(
-            itf_file_path, 'dictionary_data/translations_DM01AVCH.txt',
+            itf_file_path, dictionary_file,
             rules
         )
