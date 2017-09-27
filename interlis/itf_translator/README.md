@@ -1,5 +1,5 @@
 # ITFTranslator
-*ITFTranslator* is a tool to translate interlis v1 transfer files (itf) in another language based on a text file 
+*ITFTranslator* is a tool to translate Interlis v1 transfer files (itf) into another language based on a text file 
 dictionary. 
 
 A program developed by Swisstopo called _DM01AVCH_Translator_ already exists to translate federal model's itf files. 
