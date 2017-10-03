@@ -46,7 +46,7 @@ class ITFTranslator(object):
             self.dictionary_file_path, language_from, language_to)
 
         itf_file = open(self.itf_file_path, 'r', encoding='ISO-8859-1')
-        output_file = open(output_file_path, 'w')
+        output_file = open(output_file_path, 'w', encoding='ISO-8859-15')
         data = itf_file.readlines()
 
         current_topic = None
