@@ -1,4 +1,5 @@
 import yaml
+import unicodedata
 
 from qgis.core import (
     QgsProject, QgsCategorizedSymbolRendererV2, QgsLayerTreeGroup,
@@ -17,7 +18,6 @@ class QgisLayersTranslator(object):
         layers = self.iface.legendInterface().layers()
 
         for layer in layers:
-            print('layer: {}, type: {}'.format(layer.name(), type(layer)))
             if type(layer) is QgsVectorLayer:
                 self.translate_layer_style_categories(layer)
                 self.translate_layer_attribute_alias(layer)
@@ -26,10 +26,6 @@ class QgisLayersTranslator(object):
             # Translate layer name must be callled after style categories and
             # layer attributes
             self.translate_layer_name(layer)
-
-
-                # TODO make this at the end of the layer loading, but how?
-        # translate_layer_group_name(iface)
 
     def translate_layer_attribute_alias(self, layer):
         """Translate the attributes of the layer adding aliases"""
@@ -48,26 +44,19 @@ class QgisLayersTranslator(object):
     def translate_layer_name(self, layer):
         """Translate the layer name"""
 
-        print('translate_layer_name: {}'.format(layer.name()))
         translation = self.dictionary.translate(
             'layer_name', 'all', layer.name())
         if translation:
             layer.setLayerName(translation)
 
     def translate_layer_style_categories(self, layer):
-
-        print('cat layer: {}'.format(layer.name()))
         # check if it's a vector layer
         if not type(layer) is QgsVectorLayer:
             return
 
-        print('cat layer rend: {}'.format(layer.rendererV2()))
-
         renderer = layer.rendererV2()
         if not type(renderer) is QgsCategorizedSymbolRendererV2:
             return
-
-        print('cat layer: {}'.format(layer.name()))
 
         categories = renderer.categories()
 
@@ -81,9 +70,26 @@ class QgisLayersTranslator(object):
         legend = iface.legendInterface()
         legend.refreshLayerSymbology(layer)
 
-    # TODO add method to translate single group name
+    def translate_layer_group_name(self, layer, name):
+        """Translate group name of a layer
 
-    def translate_layer_group_name(self, iface):
+        :param layer: The layer
+        :param name: The group name
+        :return: The translated name
+        """
+        # Remove the last part (project name in parentheses) of the group name
+        proj_name = name[name.rfind(' ('):]
+        only_group_name = name[:name.rfind(' (')]
+
+        translation = self.dictionary.translate(
+            'layer_group', 'all', only_group_name
+        )
+
+        return translation + proj_name
+
+    def translate_layer_group_names(self, iface):
+        """Translate all the groups names"""
+
         root = QgsProject.instance().layerTreeRoot()
         for child in root.children():
             if isinstance(child, QgsLayerTreeGroup):
@@ -107,29 +113,37 @@ class Dictionary:
         except Exception as e:
             print(e)
 
-    def translate(self, type, context, word):
+    def translate(self, typez, context, word):
         """Translate a word.
 
         return the untranslated word if the translation is not in the dict"""
 
-        # TODO remove. Only for test
-        #print(type, context, word)
-        #self._add_to_dictionary_template(type, context, word)
+        print('translation request: {} | {} | {}'.format(
+            typez.encode('ascii', 'ignore'), context.encode('ascii', 'ignore'),
+            word.encode('ascii', 'ignore')))
+
+        # ===========
+        # Uncomment to generate template yml
+        #self._add_to_dictionary_template(typez, context, word)
         #return word
-        # ----
+        # ===========
 
         try:
-            trans = self.dictionary[type][context][word]
+            trans = self.dictionary[typez][context][word]
+            print('returned translation: {}'.format(
+                trans.encode('ascii', 'ignore')))
             return trans
-        except:
-            return word                                                                 
+        except Exception as e:
+            print('returned translation_e: {}'.format(
+                word.encode('ascii', 'ignore')))
+            return word
+
     # ================================================================
 
-    def _add_to_dictionary_template(self, type, context, word):
+    def _add_to_dictionary_template(self, typez, context, word):
         """Create a dictionary template yaml with the requested words. The
-        translation in the tempate will be the word with prefix X
+        translation in the tempate will be the word with prefix FR_
         """
-
         template_dictionary = yaml.safe_load(open(
             '/home/mario/tmp/verivd/template_dict.yml'))
 
@@ -137,47 +151,16 @@ class Dictionary:
             template_dictionary = {}
 
         try:
-            template_dictionary[type][context][word] = 'FR_'+word
+            template_dictionary[typez][context][word] = 'FR_'+word
         except:
             try:
-                template_dictionary[type][context] = {word: 'FR_'+word}
+                template_dictionary[typez][context] = {word: 'FR_'+word}
             except:
-                template_dictionary[type] = {context: {word: 'FR_'+word}}
-
-        #print(template_dictionary)
+                template_dictionary[typez] = {context: {word: 'FR_'+word}}
 
         stream = file('/home/mario/tmp/verivd/template_dict.yml', 'w')
 
         stream.write(yaml.safe_dump(template_dictionary, default_flow_style =
-        False))
+        False, allow_unicode=True))
 
         stream.close()
-
-    def XXget_translation(self, type, context, text):
-    # TODO remove. Created only for test
-
-        if text == 'art':
-            return 'genre'
-        elif text == 'qualitaet_txt':
-            return 'qualite_txt'
-        elif text == 'EO Linienelemente':
-            return 'Proba layer name'
-        elif text == 'restliche EO-Arten':
-            return 'trrr rest EO-qualcosa'
-        elif text == 'befestigt.Bahn':
-            return 'befe trein'
-        elif text == 'AV Allgemein (verivd_20170913_0950)':
-            return 'Uella'
-        else:
-            return None
-
-
-if __name__ == '__main__':
-    dictionary_verivd = Dictionary('/home/mario/Dropbox/workspace/veriso/modules/verivd/translations_verivd.yml')
-
-    dictionary_verivd._add_to_dictionary_template('one', 'two', 'three')
-    dictionary_verivd._add_to_dictionary_template('one', 'two', 'four')
-    dictionary_verivd._add_to_dictionary_template('one', 'two', 'five')
-    dictionary_verivd._add_to_dictionary_template('one', 'six', 'seven')
-    dictionary_verivd._add_to_dictionary_template('one', 'eight', 'nine')
-    #print(dictionary_verivd.translate('Layer', 'Base', 'EO Punktelemente'))
