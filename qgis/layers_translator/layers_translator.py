@@ -118,9 +118,9 @@ class Dictionary:
 
         return the untranslated word if the translation is not in the dict"""
 
-        print('translation request: {} | {} | {}'.format(
-            typez.encode('ascii', 'ignore'), context.encode('ascii', 'ignore'),
-            word.encode('ascii', 'ignore')))
+        # print('translation request: {} | {} | {}'.format(
+        #    typez.encode('ascii', 'ignore'), context.encode('ascii', 'ignore'),
+        #    word.encode('ascii', 'ignore')))
 
         # ===========
         # Uncomment to generate template yml
@@ -130,12 +130,12 @@ class Dictionary:
 
         try:
             trans = self.dictionary[typez][context][word]
-            print('returned translation: {}'.format(
-                trans.encode('ascii', 'ignore')))
+            # print('returned translation: {}'.format(
+            #    trans.encode('ascii', 'ignore')))
             return trans
         except Exception as e:
-            print('returned translation_e: {}'.format(
-                word.encode('ascii', 'ignore')))
+            # print('returned translation_e: {}'.format(
+            #    word.encode('ascii', 'ignore')))
             return word
 
     # ================================================================
